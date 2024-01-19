@@ -27,7 +27,7 @@ const main = async () => {
     res.send("Successfuly sent value");
   });
 
-  server.get("/", (req, res) => {
+  server.get("/", (_, res) => {
     res.send("hello world");
   });
 
