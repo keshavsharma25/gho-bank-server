@@ -1,3 +1,5 @@
+import { Address } from "viem";
+
 export enum Tokens {
   DAI = "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357",
   Link = "0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5",
@@ -9,4 +11,5 @@ export enum Tokens {
   EURS = "0x6d906e526a4e2Ca02097BA9d0caA3c382F52278E",
 }
 
-export const BANK_ADDRESS = "0x6851b17D206Fb6820780F797343AFfC3a1f0b556";
+export const BANK_ADDRESS: Address =
+  "0x6851b17D206Fb6820780F797343AFfC3a1f0b556";
