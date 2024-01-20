@@ -1,24 +1,17 @@
-import { Address } from "viem";
-import { Bank, permitToken } from "../abi";
-import { getAccount, client } from "./client";
-import { BANK_ADDRESS, Tokens } from "./constants";
+import { Bank } from "../abi";
+import { SupplyParamsType, SupplyWithPermitParamsType } from "../types";
+import { client, getAccount } from "./client";
+import { BANK_ADDRESS } from "./constants";
 
-export const scheduleSupply = async (id: number, date: Date) => {
-  // TODO: After adding DB implement adding id
-  const asset: Tokens = Tokens.AAVE;
-  const owner: Address = "0xE6E065248026b1a91820b631A7bbB79AB6C53677";
-
-  const amount = await client.readContract({
-    address: asset,
-    abi: permitToken,
-    functionName: "allowance",
-    args: [owner, BANK_ADDRESS],
-  });
-
+export const scheduleSupply = async ({
+  asset,
+  amount,
+  date,
+  owner,
+}: SupplyParamsType) => {
   try {
-    console.log(`Supplying ${id} on ${date}`);
-
     if (Number(amount) > 0) {
+      console.log(`Supplying on behalf of ${owner} at time: ${date}`);
       const managerAccount = getAccount();
 
       const tx = await client.writeContract({
@@ -29,13 +22,56 @@ export const scheduleSupply = async (id: number, date: Date) => {
         args: [asset, amount, owner],
       });
 
-      const receipt = await client.waitForTransactionReceipt({
+      const { status } = await client.waitForTransactionReceipt({
         hash: tx,
       });
 
-      console.log("Tx receipt: ", receipt.transactionHash);
+      console.log("-------------------------------------");
+      console.log(`Tx hash: ${tx}`);
+      console.log(`Tx status: ${status}`);
+      console.log("-------------------------------------");
     }
   } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+    }
+  }
+};
+
+export const scheduleSupplyWithPermit = async ({
+  amount,
+  asset,
+  deadline,
+  date,
+  owner,
+  v,
+  r,
+  s,
+}: SupplyWithPermitParamsType) => {
+  try {
+    if (Number(amount) > 0) {
+      console.log(`Supplying on behalf of ${owner} at time: ${date}`);
+      const managerAccount = getAccount();
+
+      const tx = await client.writeContract({
+        account: managerAccount,
+        address: BANK_ADDRESS,
+
+        abi: Bank,
+        functionName: "supplyWithPermit",
+        args: [asset, amount, owner, deadline, v, r, s],
+      });
+
+      const { status } = await client.waitForTransactionReceipt({
+        hash: tx,
+      });
+
+      console.log("-------------------------------------");
+      console.log(`Tx hash: ${tx}`);
+      console.log(`Tx status: ${status}`);
+      console.log("-------------------------------------");
+    }
+  } catch (err) {
     if (err instanceof Error) {
       console.log(err.message);
     }
