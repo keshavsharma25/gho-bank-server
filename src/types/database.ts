@@ -9,36 +9,57 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      BookKeep: {
+      Accounts: {
         Row: {
           account: string
-          amount: string | null
           created_at: string
-          deadline: string | null
+          last_bookkeep_id: number | null
+        }
+        Insert: {
+          account: string
+          created_at?: string
+          last_bookkeep_id?: number | null
+        }
+        Update: {
+          account?: string
+          created_at?: string
+          last_bookkeep_id?: number | null
+        }
+        Relationships: []
+      }
+      BookKeep: {
+        Row: {
+          account: string | null
+          amount: string | null
+          asset: string | null
+          created_at: string
+          deadline: number | null
           id: number
-          isPermit: boolean
+          isPermit: boolean | null
           r: string | null
           s: string | null
           v: number | null
         }
         Insert: {
-          account: string
+          account?: string | null
           amount?: string | null
+          asset?: string | null
           created_at?: string
-          deadline?: string | null
+          deadline?: number | null
           id?: number
-          isPermit?: boolean
+          isPermit?: boolean | null
           r?: string | null
           s?: string | null
           v?: number | null
         }
         Update: {
-          account?: string
+          account?: string | null
           amount?: string | null
+          asset?: string | null
           created_at?: string
-          deadline?: string | null
+          deadline?: number | null
           id?: number
-          isPermit?: boolean
+          isPermit?: boolean | null
           r?: string | null
           s?: string | null
           v?: number | null
