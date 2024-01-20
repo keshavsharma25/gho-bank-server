@@ -66,6 +66,36 @@ export interface Database {
         }
         Relationships: []
       }
+      PendingTransactions: {
+        Row: {
+          amount: string
+          asset: string
+          created_at: string
+          id: number
+          isCompleted: boolean
+          isRevoked: number
+          transactionHash: string
+        }
+        Insert: {
+          amount: string
+          asset: string
+          created_at?: string
+          id?: number
+          isCompleted?: boolean
+          isRevoked?: number
+          transactionHash: string
+        }
+        Update: {
+          amount?: string
+          asset?: string
+          created_at?: string
+          id?: number
+          isCompleted?: boolean
+          isRevoked?: number
+          transactionHash?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

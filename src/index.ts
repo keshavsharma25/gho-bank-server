@@ -1,6 +1,9 @@
 import "dotenv/config";
 import express from "express";
-import { watchAllTokenApprovals } from "./utils/watchEvents";
+import {
+  watchAllTokenApprovals,
+  watchAllTokenTransfersForAllAccs,
+} from "./utils/watchEvents";
 import { permitRoute } from "./routes/permit";
 
 const main = async () => {
@@ -14,6 +17,7 @@ const main = async () => {
   });
 
   watchAllTokenApprovals();
+  await watchAllTokenTransfersForAllAccs();
 
   server.listen(8080, () => {
     console.log("Starting server...");

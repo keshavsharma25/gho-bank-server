@@ -5,6 +5,7 @@ import { client } from "./client";
 import { BANK_ADDRESS, Tokens } from "./constants";
 import { getAccountConfig } from "./getAccountConfig";
 import { scheduleSupply } from "./scheduler";
+import { dbClient } from "./db";
 
 const watchTokenApproval = (token: Tokens, to: Address) => {
   const unwatch = client.watchContractEvent({
@@ -85,4 +86,58 @@ export const watchAllTokenApprovals = () => {
   tokens.forEach((token: Tokens) => {
     watchTokenApproval(token, BANK_ADDRESS);
   });
+};
+
+export const watchTokenTransfer = (token: Address, to: Address) => {
+  const unwatch = client.watchContractEvent({
+    address: token,
+    abi: permitToken,
+    eventName: "Transfer",
+    args: {
+      to,
+    },
+    onLogs: async (logs) => {
+      try {
+        if (!(logs && logs[0])) {
+          throw new Error("Logs does not exist!");
+        }
+
+        const { transactionHash, args } = logs[0];
+
+        if (!(args && args.value)) {
+          throw new Error("Args does not exist!");
+        }
+
+        await dbClient.from("PendingTransactions").insert({
+          transactionHash,
+          amount: String(Number(args.value)),
+          asset: token,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
+      }
+    },
+  });
+
+  return unwatch;
+};
+
+export const watchAllTokenTransfers = (to: Address) => {
+  const tokens = Object.values(Tokens);
+
+  tokens.forEach((token: Tokens) => {
+    watchTokenTransfer(token, to);
+  });
+};
+
+export const watchAllTokenTransfersForAllAccs = async () => {
+  const { data } = await dbClient.from("Accounts").select("account");
+
+  if (data?.length) {
+    data?.forEach((account: unknown) => {
+      watchAllTokenTransfers(account as Address);
+    });
+  }
 };
