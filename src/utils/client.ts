@@ -4,7 +4,7 @@ import { sepolia } from "viem/chains";
 
 export const client = createWalletClient({
   chain: sepolia,
-  transport: http(),
+  transport: http(process.env["RPC_URL"]),
 }).extend(publicActions);
 
 export const getAccount = () => {
